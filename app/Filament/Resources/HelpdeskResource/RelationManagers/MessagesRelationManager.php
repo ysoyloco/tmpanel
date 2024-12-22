@@ -14,13 +14,15 @@ class MessagesRelationManager extends RelationManager
     protected static string $relationship = 'messages';
     protected static ?string $title = 'Konwersacja';
     protected static ?string $recordTitleAttribute = 'content';
-
     public function render(): View
     {
         return view('filament.resources.helpdesk.messages', [
-            'messages' => $this->getRelationship()->orderBy('created_at', 'desc')->get(),
+            'messages' => $this->getRelationship()
+                ->orderBy('created_at', 'desc')
+                ->paginate(10)
         ]);
     }
+    
 
     public function form(Form $form): Form
     {

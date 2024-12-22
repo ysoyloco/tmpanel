@@ -69,7 +69,6 @@ class InvoiceResource extends Resource
         return [
             'index' => Pages\ListInvoices::route('/'),
             'create' => Pages\CreateInvoice::route('/create'),
-            'edit' => Pages\EditInvoice::route('/{record}/edit'),
         ];
     }
 

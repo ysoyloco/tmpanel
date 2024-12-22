@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\HelpdeskResource\Pages;
@@ -14,6 +15,7 @@ use Filament\Forms\Components\Select;
 use App\Filament\Resources\HelpdeskResource\RelationManagers\MessagesRelationManager;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Hidden;
+use App\Models\Message;
 
 class HelpdeskResource extends Resource
 {
@@ -42,6 +44,22 @@ class HelpdeskResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query
+                ->whereExists(function ($query) {
+                    $query->select('id')
+                        ->from('messages')
+                        ->whereColumn('subject_id', 'subjects.id');
+                })
+                ->select('subjects.*')
+                ->selectSub(
+                    Message::select('created_at')
+                        ->whereColumn('subject_id', 'subjects.id')
+                        ->latest()
+                        ->limit(1),
+                    'last_message_at'
+                )
+                ->orderByDesc('last_message_at')
+            )
             ->columns([
                 TextColumn::make('user.email')
                     ->label('Użytkownik')
@@ -55,27 +73,33 @@ class HelpdeskResource extends Resource
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'new' => 'info',
                         'waiting_for_support' => 'warning',
                         'waiting_for_customer' => 'primary',
                         'closed' => 'success',
                     })
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
                         'new' => 'Nowe',
                         'waiting_for_support' => 'Oczekuje na helpdesk',
                         'waiting_for_customer' => 'Oczekuje na klienta',
                         'closed' => 'Zamknięte',
                     }),
+                TextColumn::make('last_message_at')
+                    ->label('Data ostatniej wiadomości')
+                    ->dateTime('d.m.Y H:i'),
                 TextColumn::make('created_at')
                     ->label('Data utworzenia')
                     ->dateTime('d.m.Y H:i'),
+            ])
+            ->paginated([
+                'items_per_page_select_options' => 20,
             ]);
     }
     public static function getRelations(): array
     {
         return [
-           MessagesRelationManager::class,
+            MessagesRelationManager::class,
         ];
     }
 
@@ -89,12 +113,11 @@ class HelpdeskResource extends Resource
         ];
     }
 
-public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
-{
-    $query = parent::getEloquentQuery();
-    return auth()->user()->isAdmin() 
-        ? $query 
-        : $query->where('user_id', auth()->id());
-}
-
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = parent::getEloquentQuery();
+        return auth()->user()->isAdmin()
+            ? $query
+            : $query->where('user_id', auth()->id());
+    }
 }
