@@ -35,48 +35,34 @@ class InvoiceResource extends Resource
                     ->label('Data wpłynięcia')
                     ->dateTime('d.m.Y H:i')
                     ->sortable(),
-                    
+                
+                TextColumn::make('user.name')
+                    ->label('Imię i nazwisko')
+                    ->visible(fn() => auth()->user()->isAdmin()),
+                
+                TextColumn::make('user.email')
+                    ->label('Email')
+                    ->visible(fn() => auth()->user()->isAdmin()),
+                
                 TextColumn::make('amount')
                     ->label('Kwota')
                     ->money('pln')
                     ->sortable(),
-                    
-                TextColumn::make('status')
-                    ->label('Status')
-                    ->badge()
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'booked' => 'Zaksięgowane',
-                        'cancelled' => 'Anulowane',
-                        'processing' => 'W trakcie przetwarzania',
-                    })
-                    ->color(fn (string $state): string => match ($state) {
-                        'booked' => 'success',
-                        'cancelled' => 'danger',
-                        'processing' => 'warning',
-                    }),
+                
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->label('Edytuj'),
-                Tables\Actions\DeleteAction::make()
-                    ->label('Usuń'),
                 Action::make('downloadInvoice')
                     ->label('Pobierz fakturę')
                     ->icon('heroicon-o-document-arrow-down')
                     ->action(function (Invoice $record) {
-                        $pdf = \PDF::loadView('invoices.invoice', ['invoice' => $record]);
-                        return response()->streamDownload(function () use ($pdf) {
-                            echo $pdf->output();
-                        }, "faktura_{$record->id}.pdf");
+                        $pdf = PDF::loadView('invoices.invoice', ['invoice' => $record]);
+                        return response()->streamDownload(
+                            fn () => print($pdf->output()),
+                            "faktura_{$record->id}.pdf"
+                        );
                     }),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
-                        ->label('Usuń zaznaczone'),
-                ]),
-            ]);
-    }
+            
+            ]);    }
 
     public static function getPages(): array
     {
