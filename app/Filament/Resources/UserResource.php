@@ -15,6 +15,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Toggle;
 use App\Filament\Resources\UserResource\Pages;
+use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 
 class UserResource extends Resource
 {
@@ -23,30 +24,21 @@ class UserResource extends Resource
     protected static ?string $navigationLabel = 'Użytkownicy';
     protected static ?string $modelLabel = 'Użytkownik';
     protected static ?string $pluralModelLabel = 'Użytkownicy';
-
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('name')
-                    ->label('Nazwa')
-                    ->searchable(),
-                TextColumn::make('email')
-                    ->label('Email')
-                    ->searchable(),
+                TextColumn::make('name')->label('Nazwa'),
+                TextColumn::make('email')->label('Email'),
                 IconColumn::make('is_admin')
                     ->boolean()
                     ->label('Administrator'),
             ])
             ->actions([
-                Action::make('impersonate')
-                    ->label('Zaloguj jako')
-                    ->icon('heroicon-o-identification')
-                    ->action(fn (User $user) => auth()->login($user))
-                    ->visible(fn () => auth()->user()->isAdmin())
+                Impersonate::make(),
             ]);
     }
-
+    
     public static function getNavigationGroup(): ?string
     {
         return 'Administracja';

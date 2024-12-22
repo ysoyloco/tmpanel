@@ -12,6 +12,8 @@ use Filament\Forms\Form;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use App\Filament\Resources\HelpdeskResource\RelationManagers\MessagesRelationManager;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Hidden;
 
 class HelpdeskResource extends Resource
 {
@@ -25,25 +27,15 @@ class HelpdeskResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('user_id')
-                    ->relationship('user', 'email')
-                    ->required()
-                    ->label('Użytkownik'),
                 TextInput::make('title')
                     ->label('Temat zgłoszenia')
                     ->required(),
-                TextInput::make('ticket_id')
-                    ->label('Numer zgłoszenia')
-                    ->required(),
-                Select::make('status')
-                    ->label('Status')
-                    ->options([
-                        'new' => 'Nowe',
-                        'waiting_for_support' => 'Oczekuje na helpdesk',
-                        'waiting_for_customer' => 'Oczekuje na klienta',
-                        'closed' => 'Zamknięte'
-                    ])
-                    ->required(),
+                Hidden::make('user_id')
+                    ->default(fn() => auth()->id()),
+                Hidden::make('status')
+                    ->default('new'),
+                Hidden::make('ticket_id')
+                    ->default('TIC-' . \Illuminate\Support\Str::random(8))
             ]);
     }
 
@@ -96,7 +88,6 @@ class HelpdeskResource extends Resource
             'view' => Pages\ViewHelpdesk::route('/{record}'),
         ];
     }
-
 
 public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
 {

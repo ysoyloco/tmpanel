@@ -9,7 +9,7 @@ class Message extends Model
     protected $fillable = [
         'subject_id',
         'content',
-        'direction', // incoming/outgoing
+        'direction',
         'email'
     ];
 

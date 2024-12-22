@@ -60,12 +60,24 @@ class PaymentResource extends Resource
                 TextColumn::make('received_at')
                     ->label('Data wpłynięcia')
                     ->dateTime('d.m.Y H:i')
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
+                
+                TextColumn::make('user.name')
+                    ->label('Imię i nazwisko')
+                    ->visible(fn() => auth()->user()->isAdmin())
+                    ->searchable(),
+                
+                TextColumn::make('user.email')
+                    ->label('Email')
+                    ->visible(fn() => auth()->user()->isAdmin())
+                    ->searchable(),
                     
                 TextColumn::make('amount')
                     ->label('Kwota')
                     ->money('pln')
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                     
                 TextColumn::make('payment_type')
                     ->label('Metoda płatności')
@@ -98,8 +110,7 @@ class PaymentResource extends Resource
                     Tables\Actions\DeleteBulkAction::make()
                         ->label('Usuń zaznaczone'),
                 ]),
-            ]);
-    }
+            ]);    }
 
     public static function getPages(): array
     {

@@ -1,23 +1,25 @@
-<div class="space-y-4">
-    <div class="flex justify-between items-center">
-        <h2 class="text-lg font-bold">Historia konwersacji</h2>
-    </div>
-
-    <div class="space-y-4">
-        @foreach($messages as $message)
-            <div class="p-4 bg-gray-800 rounded-lg shadow {{ $message->direction === 'incoming' ? 'ml-4' : 'mr-4' }}">
-                <div class="flex justify-between items-start">
-                    <div class="text-sm text-gray-300">
-                        {{ $message->email }}
-                    </div>
-                    <div class="text-sm text-gray-400">
-                        {{ $message->created_at->format('d.m.Y H:i') }}
-                    </div>
+<div class="space-y-4 p-4">
+    @foreach($messages as $message)
+        <div @class([
+            'p-4 rounded-lg shadow-sm',
+            'ml-12 bg-blue-100 dark:bg-blue-950/50' => $message->direction === 'incoming',
+            'mr-12 bg-emerald-100 dark:bg-emerald-950/50' => $message->direction === 'outgoing',
+        ])>
+            <div class="flex justify-between items-start">
+                <div @class([
+                    'font-medium',
+                    'text-blue-700 dark:text-blue-400' => $message->direction === 'incoming',
+                    'text-emerald-700 dark:text-emerald-400' => $message->direction === 'outgoing',
+                ])>
+                    {{ $message->email }}
                 </div>
-                <div class="mt-2 text-gray-100">
-                    {{ $message->content }}
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ $message->created_at->format('d.m.Y H:i') }}
                 </div>
             </div>
-        @endforeach
-    </div>
+            <div class="mt-2">
+                {{ $message->content }}
+            </div>
+        </div>
+    @endforeach
 </div>

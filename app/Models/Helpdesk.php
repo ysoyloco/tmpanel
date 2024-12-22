@@ -10,7 +10,6 @@ class Helpdesk extends Model
     
     protected $fillable = [
         'title',
-        'content',
         'ticket_id',
         'status',
         'conversation'
