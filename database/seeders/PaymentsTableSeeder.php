@@ -1,27 +1,24 @@
 <?php
 namespace Database\Seeders;
 
+use App\Models\Payment;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class PaymentsTableSeeder extends Seeder
 {
     public function run()
     {
-        // Example seeding for 10 payments
-        $users = \App\Models\User::all(); // Assuming you have some users already seeded
+        $users = User::all();
+        
         foreach ($users as $user) {
-            $uuid = Str::uuid()->toString();
-
-            DB::table('payments')->insert([
-                'user_id'    => $user->id,
-                'payment_id' => substr(md5($uuid), 0, 5), // Generate a unique payment ID
-                'plan' => "10-MBPS", // Generate a unique payment ID
-                'amount' => 100, // Generate a unique payment ID
-                'status'     => 'completed', // Example status
-                'created_at' => now(),
-                'updated_at' => now(),
+            Payment::create([
+                'user_id' => $user->id,
+                'amount' => rand(100, 1000),
+                'payment_type' => ['payu', 'bank_transfer'][rand(0, 1)],
+                'status' => ['booked', 'cancelled', 'processing'][rand(0, 2)],
+                'received_at' => Carbon::now()->subDays(rand(1, 30)),
             ]);
         }
     }

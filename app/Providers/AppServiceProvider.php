@@ -8,6 +8,7 @@ use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Placeholder;
 use Filament\Tables\Columns\Column;
 use Filament\Tables\Filters\BaseFilter;
+use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,20 +27,20 @@ class AppServiceProvider extends ServiceProvider
             BaseFilter::class,
             Placeholder::class,
             Column::class,
-            // or even `BaseAction::class`,
         ]);
     }
+
     /**
      * Bootstrap any application services.
      */
     public function boot(): void
     {
+        Schema::defaultStringLength(191);
         $this->autoTranslateLabels();
 
         LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
             $switch
-                ->locales(['en', 'pl']) // also accepts a closure
-            ;
+                ->locales(['en', 'pl']);
         });
     }
 

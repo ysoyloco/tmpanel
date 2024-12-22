@@ -8,99 +8,115 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Support\Carbon;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Actions\Action;
 use Illuminate\Contracts\Support\Htmlable;
 use App\Filament\Resources\PaymentResource\Pages;
+use Filament\Notifications\Notification;
 
 class PaymentResource extends Resource
 {
     protected static ?string $model = Payment::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                // Your form schema here
-            ]);
-    }
+    protected static ?string $navigationIcon = 'heroicon-o-credit-card';
+    protected static ?string $navigationLabel = 'Płatności';
+    protected static ?string $modelLabel = 'Płatność';
+    protected static ?string $pluralModelLabel = 'Płatności';
 
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(function (Builder $query) {
-                return $query->where('user_id', auth('web')->id());
-            })
+            ->headerActions([
+                Action::make('payu')
+                    ->label('Nowa płatność PayU')
+                    ->icon('heroicon-o-credit-card')
+                    ->action(function () {
+                        $statuses = ['booked', 'processing', 'cancelled'];
+                        $newStatus = $statuses[array_rand($statuses)];
+                        
+                        Payment::create([
+                            'user_id' => auth()->id(),
+                            'amount' => rand(100, 1000),
+                            'payment_type' => 'payu',
+                            'status' => $newStatus,
+                            'received_at' => now()
+                        ]);
+
+                        $statusMessages = [
+                            'booked' => 'Płatność zaksięgowana',
+                            'processing' => 'Płatność w trakcie przetwarzania',
+                            'cancelled' => 'Płatność anulowana'
+                        ];
+
+                        Notification::make()
+                            ->title($statusMessages[$newStatus])
+                            ->send();
+                    })
+            ])
             ->columns([
-                TextColumn::make('created_at')
-                    ->label(__('filament.columns.date'))
-                    ->sortable()
-                    ->searchable()
-                    ->formatStateUsing(fn($state) => \Carbon\Carbon::parse($state)->format('M d, Y')),
-                TextColumn::make('payment_id')
-                    ->label(__('filament.columns.payment_id')),
+                TextColumn::make('received_at')
+                    ->label('Data wpłynięcia')
+                    ->dateTime('d.m.Y H:i')
+                    ->sortable(),
+                    
                 TextColumn::make('amount')
-                    ->label(__('filament.columns.amount'))
-                    ->formatStateUsing(fn($state) => 'PLN ' . number_format($state, 2)),
+                    ->label('Kwota')
+                    ->money('pln')
+                    ->sortable(),
+                    
+                TextColumn::make('payment_type')
+                    ->label('Metoda płatności')
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'payu' => 'PayU',
+                        'bank_transfer' => 'Przelew bankowy',
+                    }),
+                    
                 TextColumn::make('status')
-                    ->label(__('filament.columns.status'))
+                    ->label('Status')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'completed' => 'success',
-                        'pending' => 'warning',
-                        'fail' => 'danger',
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'booked' => 'Zaksięgowane',
+                        'cancelled' => 'Anulowane',
+                        'processing' => 'W trakcie przetwarzania',
+                    })
+                    ->color(fn (string $state): string => match ($state) {
+                        'booked' => 'success',
+                        'cancelled' => 'danger',
+                        'processing' => 'warning',
                     }),
             ])
             ->filters([])
             ->actions([
-                Action::make('downloadInvoice')
-                    ->label(__('filament.download_invoice'))
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->action(function (Payment $record) {
-                        // Generate or retrieve the PDF for the selected payment
-                        $pdf = \PDF::loadView('invoices.invoice', ['payment' => $record]);
-                        return response()->streamDownload(function () use ($pdf) {
-                            echo $pdf->output();
-                        }, "invoice_{$record->payment_id}.pdf");
-                    }),
+                Tables\Actions\DeleteAction::make()
+                    ->label('Usuń'),
             ])
             ->bulkActions([
-                // Your bulk actions here
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label('Usuń zaznaczone'),
+                ]),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            // Your relations here
-        ];
-    }
-
-    public static function getNavigationLabel(): string
-    {
-        return __('filament.payment');
-    }
-
-    public function getTitle(): string | Htmlable
-    {
-        return __('filament.payment');
-    }
-
-    protected static ?string $label = null;
-
-    public static function getLabel(): string
-    {
-        return __('filament.payment');
     }
 
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListPayments::route('/'),
-            // Your other pages here
         ];
     }
+
+
+public static function getEloquentQuery(): Builder
+{
+    $query = parent::getEloquentQuery();
+    
+    if (!auth()->user()->isAdmin()) {
+        $query->where('user_id', auth()->id());
+    }
+    
+    return $query;
+}
 }

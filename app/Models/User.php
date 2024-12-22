@@ -44,4 +44,31 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+public function payments()
+{
+    return $this->hasMany(Payment::class);
+}
+
+public function helpdesk()
+{
+    return $this->hasMany(Helpdesk::class);
+}
+
+
+public function subjects()
+{
+    return $this->hasMany(Subject::class);
+}
+
+
+public function isAdmin(): bool
+{
+    return $this->is_admin;
+}
 }

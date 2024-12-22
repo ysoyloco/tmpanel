@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Invoice</title>
+    <title>Faktura</title>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    {{--
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    --}}
 
     <style>
         @page {
@@ -247,7 +243,6 @@
         }
     </style>
 </head>
-
 <body>
     <div class="ll-invoice-wrapper" id="download-section">
         <div class="ll-invoice-in">
@@ -256,15 +251,15 @@
                     {{ config('app.name') }}
                 </div>
                 <div class="ll-invoice-title">
-                    Invoice
+                    Faktura
                 </div>
                 <div class="ll-invoice-bg-shape"></div>
             </div>
             <div class="ll-invoice-info">
                 <div class="ll-invoice-info_left"></div>
                 <div class="ll-invoice-info_right">
-                    <div><span>Date:</span>
-                        <b>{{ $payment->created_at->format('M d, Y') ?? 'N/A' }}</b>
+                    <div><span>Data:</span>
+                        <b>{{ $invoice->received_at->format('d.m.Y') }}</b>
                     </div>
                 </div>
                 <div class="ll-invoice-info_shape"></div>
@@ -272,8 +267,8 @@
             <div class="ll-invoice-pay-to">
                 <div class="left-side">
                     <p style="margin-bottom: 2px; color: #111;">
-                        <span>Invoice No:</span> <b>#{{ $payment->payment_id }}</b> <br>
-                        <b>Invoice From:</b>
+                        <span>Numer faktury:</span> <b>#{{ $invoice->id }}</b> <br>
+                        <b>Wystawca:</b>
                     </p>
                     <p style="margin-bottom: 15px;">
                         {{ config('app.name') }} <br>
@@ -283,17 +278,11 @@
                 </div>
                 <div class="right-side">
                     <p style="margin-bottom: 2px; color: #111;">
-                        <b>Invoice To:</b>
+                        <b>Nabywca:</b>
                     </p>
-                    @php
-                    $amount = number_format($payment->amount, 2);
-                    $email = $payment->user->email;
-                    $name = $payment->user->name;
-                    @endphp
-
                     <p style="margin-bottom: 15px;">
-                        {{ $name ?? " N/A" }} <br>
-                        {{ $email ?? " N/A" }} <br>
+                        {{ $invoice->user->name }} <br>
+                        {{ $invoice->user->email }} <br>
                     </p>
                 </div>
             </div>
@@ -301,32 +290,15 @@
                 <div class="ll-invoice-main-table">
                     <table>
                         <thead>
-                            <tr class="">
-                                <th style="width: 30%;">Plan</th>
-                                <th style="width: 7%;">Price</th>
-                                <th style="width: 7%;" class="text-right">Total</th>
+                            <tr>
+                                <th style="width: 70%;">Opis</th>
+                                <th style="width: 30%;" class="text-right">Kwota</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>
-                                    {{ $payment->plan }}
-                                </td>
-                                {{-- @if ($transaction->payment_type != 'per_job_based')
-                                <td>
-                                    <span>Job Limit : {{ $transaction->plan->job_limit }}</span> <br>
-                                    <span>Featured Job Limit : {{ $transaction->plan->featured_job_limit }}</span>
-                                    <br>
-                                    <span>Highlight Job Limit :
-                                        {{ $transaction->plan->highlight_job_limit ?? " ammount" }}</span> <br>
-                                    <span>Candidate CV View Limit :
-                                        {{ $transaction->plan->candidate_cv_view_limitation == 'limited' ?
-                                        $transaction->plan->candidate_cv_view_limit : __('unlimited') }}</span>
-                                    <br>
-                                </td>
-                                @endif --}}
-                                <td>{{ "PLN " . $amount }}</td>
-                                <td class="text-right">{{ "PLN " . $amount ?? " ammount" }}</td>
+                                <td>Usługa</td>
+                                <td class="text-right">PLN {{ number_format($invoice->amount, 2) }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -336,16 +308,15 @@
                         <table>
                             <tbody>
                                 <tr style="background: #f5f6fa;">
-                                    <td style="color: #111; font-weight: 700;border-top: 1px solid #dbdfea;">Subtoal
+                                    <td style="color: #111; font-weight: 700;">Suma netto</td>
+                                    <td class="text-right" style="color: #111; font-weight: 700;">
+                                        PLN {{ number_format($invoice->amount, 2) }}
                                     </td>
-                                    <td class="text-right"
-                                        style="color: #111; font-weight: 700;border-top: 1px solid #dbdfea;">
-                                        {{"PLN " . $amount ?? " ammount" }}</td>
                                 </tr>
                                 <tr style="background-color: #FBBF24; color: white;">
-                                    <td style="font-size: 16px; font-weight: 700;">Grand Total </td>
+                                    <td style="font-size: 16px; font-weight: 700;">Suma brutto</td>
                                     <td style="font-size: 16px; font-weight: 700;" class="text-right">
-                                        {{ "PLN " . $amount ?? " ammount" }}
+                                        PLN {{ number_format($invoice->amount, 2) }}
                                     </td>
                                 </tr>
                             </tbody>
@@ -355,12 +326,9 @@
             </div>
             <div style="position: absolute; bottom: 30px; left:50px; right: 50px; text-align: center;">
                 <hr style="background: #dbdfea; margin-bottom: 15px;">
-                <p style="margin-bottom: 2px"><b style="color:#111">Terms &amp; Conditions:</b></p>
-                <a href="" target="_blank" rel="noopener noreferrer">View Terms &
-                    Condition</a>
+                <p style="margin-bottom: 2px"><b style="color:#111">Status: {{ $invoice->status }}</b></p>
             </div>
         </div>
     </div>
 </body>
-
 </html>

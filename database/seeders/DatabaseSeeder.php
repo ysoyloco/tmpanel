@@ -1,36 +1,34 @@
 <?php
-
 namespace Database\Seeders;
 
 use App\Models\User;
-use Database\Seeders\PaymentsTableSeeder;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Create admin user
+        User::create([
+            'name' => 'Admin',
+            'email' => 'admin@mail.com',
+            'password' => bcrypt('password'),
+            'is_admin' => true,
+        ]);
 
-        User::factory()->create([
-            'name' => 'customer',
+        // Create customer user
+        User::create([
+            'name' => 'Customer',
             'email' => 'customer@mail.com',
             'password' => bcrypt('password'),
+            'is_admin' => false,
         ]);
 
-        User::factory()->create([
-            'name' => 'customer2',
-            'email' => 'customer2@mail.com',
-            'password' => bcrypt('password'),
-        ]);
-
+        // Run other seeders
         $this->call([
-            PaymentsTableSeeder::class, // Ensure this line is present
+            PaymentsTableSeeder::class,
+            InvoicesTableSeeder::class,
+            HelpdeskTableSeeder::class,
         ]);
-
     }
 }

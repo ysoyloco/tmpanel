@@ -1,0 +1,224 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Panel Płatności API",
+        "description": "API do zarządzania użytkownikami, płatnościami i fakturami",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/invoices": {
+            "get": {
+                "tags": [
+                    "Faktury"
+                ],
+                "summary": "Lista wszystkich faktur",
+                "operationId": "2e947f49543378e8d1ac24fc3ebcdcc7",
+                "responses": {
+                    "200": {
+                        "description": "Lista faktur pobrana pomyślnie"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Faktury"
+                ],
+                "summary": "Tworzenie wielu faktur",
+                "operationId": "28d4a7eb8df38fc35f7af3e33da0312c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "invoices": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "amount": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 199.99
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "booked",
+                                                        "cancelled",
+                                                        "processing"
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Faktury utworzone pomyślnie"
+                    },
+                    "422": {
+                        "description": "Błędne dane wejściowe"
+                    }
+                }
+            }
+        },
+        "/api/payments": {
+            "get": {
+                "tags": [
+                    "Płatności"
+                ],
+                "summary": "Lista wszystkich płatności",
+                "operationId": "afcbc19a07bf33c2fcb73b5c438b476c",
+                "responses": {
+                    "200": {
+                        "description": "Lista płatności pobrana pomyślnie"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Płatności"
+                ],
+                "summary": "Tworzenie wielu płatności",
+                "operationId": "887e39c11a3a8f55e74ff6c6dcec0aaa",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "payments": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "amount": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 199.99
+                                                },
+                                                "payment_type": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "payu",
+                                                        "bank_transfer"
+                                                    ]
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "booked",
+                                                        "cancelled",
+                                                        "processing"
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Płatności utworzone pomyślnie"
+                    },
+                    "422": {
+                        "description": "Błędne dane wejściowe"
+                    }
+                }
+            }
+        },
+        "/api/users": {
+            "get": {
+                "tags": [
+                    "Użytkownicy"
+                ],
+                "summary": "Lista wszystkich użytkowników",
+                "operationId": "566aed8efb436ca506e0ef51a032ecd9",
+                "responses": {
+                    "200": {
+                        "description": "Lista użytkowników pobrana pomyślnie"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Użytkownicy"
+                ],
+                "summary": "Tworzenie wielu użytkowników",
+                "operationId": "62aa784a0f1c8427110490c3fed961a5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "users": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Jan Kowalski"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "jan@example.com"
+                                                },
+                                                "password": {
+                                                    "type": "string",
+                                                    "example": "haslo123"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Użytkownicy utworzeni pomyślnie"
+                    },
+                    "422": {
+                        "description": "Błędne dane wejściowe"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Faktury",
+            "description": "Faktury"
+        },
+        {
+            "name": "Płatności",
+            "description": "Płatności"
+        },
+        {
+            "name": "Użytkownicy",
+            "description": "Użytkownicy"
+        }
+    ]
+}
