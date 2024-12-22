@@ -15,7 +15,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Toggle;
 use App\Filament\Resources\UserResource\Pages;
-use STS\FilamentImpersonate\Tables\Actions\Impersonate;
+use App\Filament\Actions\ImpersonateAction;
 
 class UserResource extends Resource
 {
@@ -35,7 +35,7 @@ class UserResource extends Resource
                     ->label('Administrator'),
             ])
             ->actions([
-                Impersonate::make(),
+                ImpersonateAction::make(),
             ]);
     }
     
