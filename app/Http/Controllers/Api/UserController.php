@@ -25,37 +25,25 @@ class UserController extends Controller
     /**
      * @OA\Get(
      *     path="/api/users",
-     *     summary="Lista wszystkich użytkowników",
-     *     tags={"Użytkownicy"},
-     *     @OA\Response(
-     *         response=200,
-     *         description="Lista użytkowników pobrana pomyślnie"
-     *     )
+     *     summary="List all users",
+     *     tags={"Users"},
+     *     @OA\Response(response=200, description="List of users")
      * )
-     *
+     * 
      * @OA\Post(
      *     path="/api/users",
-     *     summary="Tworzenie wielu użytkowników",
-     *     tags={"Użytkownicy"},
+     *     summary="Create user",
+     *     tags={"Users"},
      *     @OA\RequestBody(
-     *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(
-     *                 property="users",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     @OA\Property(property="name", type="string", example="Jan Kowalski"),
-     *                     @OA\Property(property="email", type="string", example="jan@example.com"),
-     *                     @OA\Property(property="password", type="string", example="haslo123")
-     *                 )
-     *             )
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="email", type="string"),
+     *             @OA\Property(property="password", type="string")
      *         )
      *     ),
-     *     @OA\Response(response=201, description="Użytkownicy utworzeni pomyślnie"),
-     *     @OA\Response(response=422, description="Błędne dane wejściowe")
+     *     @OA\Response(response=201, description="User created")
      * )
-     */
-    public function index()
+     */    public function index()
     {
         return User::all();
     }

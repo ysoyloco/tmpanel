@@ -8,39 +8,27 @@ use Illuminate\Http\Request;
 class PaymentController extends Controller
 {
     /**
-     * @OA\Get(
-     *     path="/api/payments",
-     *     summary="Lista wszystkich płatności",
-     *     tags={"Płatności"},
-     *     @OA\Response(
-     *         response=200,
-     *         description="Lista płatności pobrana pomyślnie"
-     *     )
-     * )
-     *
-     * @OA\Post(
-     *     path="/api/payments",
-     *     summary="Tworzenie wielu płatności",
-     *     tags={"Płatności"},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             @OA\Property(
-     *                 property="payments",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     @OA\Property(property="user_id", type="integer", example=1),
-     *                     @OA\Property(property="amount", type="number", format="float", example=199.99),
-     *                     @OA\Property(property="payment_type", type="string", enum={"payu", "bank_transfer"}),
-     *                     @OA\Property(property="status", type="string", enum={"booked", "cancelled", "processing"})
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(response=201, description="Płatności utworzone pomyślnie"),
-     *     @OA\Response(response=422, description="Błędne dane wejściowe")
-     * )
-     */
+ * @OA\Get(
+ *     path="/api/payments",
+ *     summary="List all payments",
+ *     tags={"Payments"},
+ *     @OA\Response(response=200, description="List of payments")
+ * )
+ * 
+ * @OA\Post(
+ *     path="/api/payments",
+ *     summary="Create payment",
+ *     tags={"Payments"},
+ *     @OA\RequestBody(
+ *         @OA\JsonContent(
+ *             @OA\Property(property="amount", type="number"),
+ *             @OA\Property(property="payment_type", type="string", enum={"payu", "bank_transfer"}),
+ *             @OA\Property(property="user_id", type="integer")
+ *         )
+ *     ),
+ *     @OA\Response(response=201, description="Payment created")
+ * )
+ */     
     public function index()
     {
         return Payment::with('user')->get();

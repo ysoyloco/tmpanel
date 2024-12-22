@@ -10,34 +10,21 @@ class InvoiceController extends Controller
     /**
      * @OA\Get(
      *     path="/api/invoices",
-     *     summary="Lista wszystkich faktur",
-     *     tags={"Faktury"},
-     *     @OA\Response(
-     *         response=200,
-     *         description="Lista faktur pobrana pomyślnie"
-     *     )
+     *     summary="List all invoices",
+     *     tags={"Invoices"},
+     *     @OA\Response(response=200, description="List of invoices")
      * )
-     *
+     * 
      * @OA\Post(
-     *     path="/api/invoices",
-     *     summary="Tworzenie wielu faktur",
-     *     tags={"Faktury"},
+     *     path="/api/invoices/generate",
+     *     summary="Generate invoice for payment",
+     *     tags={"Invoices"},
      *     @OA\RequestBody(
-     *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(
-     *                 property="invoices",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     @OA\Property(property="user_id", type="integer", example=1),
-     *                     @OA\Property(property="amount", type="number", format="float", example=199.99),
-     *                     @OA\Property(property="status", type="string", enum={"booked", "cancelled", "processing"})
-     *                 )
-     *             )
+     *             @OA\Property(property="payment_id", type="integer")
      *         )
      *     ),
-     *     @OA\Response(response=201, description="Faktury utworzone pomyślnie"),
-     *     @OA\Response(response=422, description="Błędne dane wejściowe")
+     *     @OA\Response(response=201, description="Invoice generated")
      * )
      */
     public function index()
